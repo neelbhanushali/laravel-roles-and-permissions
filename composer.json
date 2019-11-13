@@ -9,5 +9,17 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "NeelBhanushali\\LaravelRolesAndPermissions\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "NeelBhanushali\\LaravelRolesAndPermissions\\LaravelRolesAndPermissionsServiceProvider"
+            ]
+        }
+    }
 }
