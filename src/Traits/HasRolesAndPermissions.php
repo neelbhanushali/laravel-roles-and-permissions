@@ -9,16 +9,17 @@ use NeelBhanushali\LaravelRolesAndPermissions\Models\Role;
 
 trait HasRolesAndPermissions
 {
-    public function roles()
+    public function model_roles()
     {
         return $this->morphToMany(Role::class, 'entity', 'model_roles', null, 'role_id')
             ->withTimestamps()
             ->using(ModelRole::class);
     }
 
-    public function permissions()
+    public function model_permissions()
     {
         return $this->morphToMany(Permission::class, 'entity', 'model_permissions', null, 'permission_id')
+            ->withTimestamps()
             ->withPivot('is_revoked')
             ->using(ModelPermission::class);
     }
