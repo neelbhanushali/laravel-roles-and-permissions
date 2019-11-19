@@ -54,6 +54,16 @@ trait HasRolesAndPermissions
             });
         }
 
-        return array_values($all_permissions);
+        return collect($all_permissions)->values();
+    }
+
+    public function hasRole($role)
+    {
+        return $this->getRoles()->contains($role);
+    }
+
+    public function hasPermission($permission)
+    {
+        return $this->getPermissions()->contains($permission);
     }
 }
