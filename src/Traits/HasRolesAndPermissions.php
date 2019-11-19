@@ -31,30 +31,30 @@ trait HasRolesAndPermissions
 
     public function getPermissions()
     {
-        $permissions_from_roles = [];
+        $permissions_from_roles = collect([]);
         foreach ($this->roles as $role) {
             foreach ($role->getPermissions() as $permission) {
-                $permissions_from_roles[] = $permission;
+                $permissions_from_roles->push($permission);
             }
         }
-        $permissions_from_roles = array_values(array_unique($permissions_from_roles));
+        $permissions_from_roles = $permissions_from_roles->unique()->values();
 
-        $model_permissions = [];
+        $model_permissions = collect([]);
         foreach ($this->permissions as $permission) {
             if (!$permission->pivot->is_revoked) {
-                $model_permissions[] = $permission->name;
+                $model_permissions->push($permission->name);
             }
         }
 
-        $all_permissions = array_merge($permissions_from_roles, $model_permissions);
+        $all_permissions = collect([])->merge($permissions_from_roles)->merge($model_permissions);
 
         foreach ($this->permissions()->where('is_revoked', 1)->get() as $revoked_permission) {
-            $all_permissions = array_filter($all_permissions, function ($permission) use ($revoked_permission) {
+            $all_permissions = $all_permissions->filter(function ($permission) use ($revoked_permission) {
                 return $permission != $revoked_permission->name;
             });
         }
 
-        return collect($all_permissions)->values();
+        return $all_permissions->unique()->values();
     }
 
     public function hasRole($role)
