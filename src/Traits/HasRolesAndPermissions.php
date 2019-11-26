@@ -66,4 +66,22 @@ trait HasRolesAndPermissions
     {
         return $this->getPermissions()->contains($permission);
     }
+
+    public function scopeRole($query, $role)
+    {
+        return $query->whereHas('roles', function ($query) use ($role) {
+            $query->where(function ($query) use ($role) {
+                $query->where('name', $role);
+            });
+        });
+    }
+
+    public function scopePermission($query, $permission)
+    {
+        return $query->whereHas('permissions', function ($query) use ($permission) {
+            $query->where(function ($query) use ($permission) {
+                $query->where('name', $permission);
+            });
+        });
+    }
 }
