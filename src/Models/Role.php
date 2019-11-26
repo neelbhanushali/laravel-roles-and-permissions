@@ -35,4 +35,9 @@ class Role extends Model
     {
         return $query->where('is_visible_to_users', 0);
     }
+
+    public function entity()
+    {
+        return $this->morphTo();
+    }
 }
