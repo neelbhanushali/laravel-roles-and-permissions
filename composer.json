@@ -1,6 +1,6 @@
 {
     "name": "neelbhanushali/laravel-roles-and-permissions",
-    "description": "Roles and Permissions feature (middleware, crud)",
+    "description": "Roles and Permissions",
     "license": "MIT",
     "authors": [
         {
