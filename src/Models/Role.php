@@ -4,9 +4,12 @@ namespace NeelBhanushali\LaravelRolesAndPermissions\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Role extends Model
 {
+    use SoftDeletes;
+
     public function permissions()
     {
         return $this->belongsToMany(Permission::class, 'role_permissions');
@@ -17,27 +20,12 @@ class Role extends Model
         return $this->permissions->pluck('name');
     }
 
-    public function scopeGlobal($query)
-    {
-        return $query->whereNull('entity_id')->whereNull('entity_type');
-    }
-
     protected static function boot()
     {
         parent::boot();
 
-        static::addGlobalScope('visible', function (Builder $builder) {
-            $builder->where('is_visible_to_users', 1);
+        static::addGlobalScope('global', function (Builder $builder) {
+            $builder->where('is_global', 1);
         });
-    }
-
-    public function scopeInvisible($query)
-    {
-        return $query->where('is_visible_to_users', 0);
-    }
-
-    public function entity()
-    {
-        return $this->morphTo();
     }
 }

@@ -70,7 +70,7 @@ trait HasRolesAndPermissions
     public function scopeRole($query, $role)
     {
         return $query->whereHas('roles', function ($query) use ($role) {
-            $query->where(function ($query) use ($role) {
+            $query->withoutGlobalScope('global')->where(function ($query) use ($role) {
                 $query->where('name', $role);
             });
         });
@@ -79,7 +79,7 @@ trait HasRolesAndPermissions
     public function scopePermission($query, $permission)
     {
         return $query->whereHas('permissions', function ($query) use ($permission) {
-            $query->where(function ($query) use ($permission) {
+            $query->withoutGlobalScope('global')->where(function ($query) use ($permission) {
                 $query->where('name', $permission);
             });
         });
