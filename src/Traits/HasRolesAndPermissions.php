@@ -13,7 +13,8 @@ trait HasRolesAndPermissions
     {
         return $this->morphToMany(Role::class, 'entity', 'model_roles', null, 'role_id')
             ->withTimestamps()
-            ->using(ModelRole::class);
+            ->using(ModelRole::class)
+            ->withoutGlobalScope('global');
     }
 
     public function permissions()
@@ -21,7 +22,8 @@ trait HasRolesAndPermissions
         return $this->morphToMany(Permission::class, 'entity', 'model_permissions', null, 'permission_id')
             ->withTimestamps()
             ->withPivot('is_revoked')
-            ->using(ModelPermission::class);
+            ->using(ModelPermission::class)
+            ->withoutGlobalScope('global');
     }
 
     public function getRoles()
@@ -32,27 +34,18 @@ trait HasRolesAndPermissions
     public function getPermissions()
     {
         $permissions_from_roles = collect([]);
-        foreach ($this->roles as $role) {
-            foreach ($role->getPermissions() as $permission) {
-                $permissions_from_roles->push($permission);
-            }
-        }
-        $permissions_from_roles = $permissions_from_roles->unique()->values();
+        $this->roles->each(function ($r) use (&$permissions_from_roles) {
+            $permissions_from_roles = $permissions_from_roles->merge($r->getPermissions());
+        });
 
-        $model_permissions = collect([]);
-        foreach ($this->permissions as $permission) {
-            if (!$permission->pivot->is_revoked) {
-                $model_permissions->push($permission->name);
-            }
-        }
+        $model_permissions = $this->permissions()->revoked(false)->pluck('name');
 
-        $all_permissions = collect([])->merge($permissions_from_roles)->merge($model_permissions);
+        $all_permissions = $permissions_from_roles
+            ->merge($model_permissions)
+            ->unique()->values();
 
-        foreach ($this->permissions()->where('is_revoked', 1)->get() as $revoked_permission) {
-            $all_permissions = $all_permissions->filter(function ($permission) use ($revoked_permission) {
-                return $permission != $revoked_permission->name;
-            });
-        }
+        // removing revoked permissions
+        $all_permissions = $all_permissions->diff($this->permissions()->revoked()->pluck('name'));
 
         return $all_permissions->unique()->values();
     }

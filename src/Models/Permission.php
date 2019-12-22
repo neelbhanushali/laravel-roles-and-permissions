@@ -18,4 +18,9 @@ class Permission extends Model
             $builder->where('is_global', 1);
         });
     }
+
+    public function scopeRevoked($query, $revoked = true)
+    {
+        return $query->where('is_revoked', $revoked ? 1 : 0);
+    }
 }
