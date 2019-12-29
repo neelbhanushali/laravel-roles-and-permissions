@@ -17,6 +17,8 @@ class CreateModelRolesTable extends Migration
             $table->string('entity_type');
             $table->string('entity_id');
             $table->unsignedBigInteger('role_id');
+            $table->string('related_type')->nullable();
+            $table->string('related_id')->nullable();
             $table->timestamps();
         });
     }

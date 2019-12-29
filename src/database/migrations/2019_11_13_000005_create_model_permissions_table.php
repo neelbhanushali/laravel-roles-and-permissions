@@ -18,6 +18,8 @@ class CreateModelPermissionsTable extends Migration
             $table->string('entity_id');
             $table->unsignedBigInteger('permission_id');
             $table->boolean('is_revoked')->default(0);
+            $table->string('related_type')->nullable();
+            $table->string('related_id')->nullable();
             $table->timestamps();
         });
     }
