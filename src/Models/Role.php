@@ -12,21 +12,11 @@ class Role extends Model
 
     public function permissions()
     {
-        return $this->belongsToMany(Permission::class, 'role_permissions')
-            ->withoutGlobalScope('global');
+        return $this->belongsToMany(Permission::class, 'role_permissions');
     }
 
     public function getPermissions()
     {
         return $this->permissions->pluck('name');
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope('global', function (Builder $builder) {
-            $builder->where('is_global', 1);
-        });
     }
 }
