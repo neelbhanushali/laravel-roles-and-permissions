@@ -13,8 +13,7 @@ trait HasRolesAndPermissions
     {
         return $this->morphToMany(Role::class, 'entity', 'model_roles', null, 'role_id')
             ->withTimestamps()
-            ->using(ModelRole::class)
-            ->withoutGlobalScope('global');
+            ->using(ModelRole::class);
     }
 
     public function permissions()
@@ -22,13 +21,28 @@ trait HasRolesAndPermissions
         return $this->morphToMany(Permission::class, 'entity', 'model_permissions', null, 'permission_id')
             ->withTimestamps()
             ->withPivot('is_revoked')
-            ->using(ModelPermission::class)
-            ->withoutGlobalScope('global');
+            ->using(ModelPermission::class);
     }
 
-    public function getRoles()
+    public function getRoles($related_type = null, $related_id = null)
     {
-        return $this->roles->pluck('name');
+        $model = $related_type ?? request('related_type');
+        $id = $related_id ?? request('related_id');
+
+        $roles = $this->roles()
+            ->where(function ($query) use ($id, $model) {
+                $query
+                    ->where(function ($query) {
+                        $query->whereNull('related_id')
+                            ->whereNull('related_type');
+                    })
+                    ->orWhere(function ($query) use ($id, $model) {
+                        $query->where('related_id', $id)
+                            ->where('related_type', $model);
+                    });
+            });
+
+        return $roles->pluck('name');
     }
 
     public function getPermissions()
@@ -63,7 +77,7 @@ trait HasRolesAndPermissions
     public function scopeRole($query, $role)
     {
         return $query->whereHas('roles', function ($query) use ($role) {
-            $query->withoutGlobalScope('global')->where(function ($query) use ($role) {
+            $query->where(function ($query) use ($role) {
                 $query->where('name', $role);
             });
         });
@@ -72,7 +86,7 @@ trait HasRolesAndPermissions
     public function scopePermission($query, $permission)
     {
         return $query->whereHas('permissions', function ($query) use ($permission) {
-            $query->withoutGlobalScope('global')->where(function ($query) use ($permission) {
+            $query->where(function ($query) use ($permission) {
                 $query->where('name', $permission);
             });
         });
