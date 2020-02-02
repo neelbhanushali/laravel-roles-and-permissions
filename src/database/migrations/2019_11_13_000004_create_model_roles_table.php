@@ -14,11 +14,11 @@ class CreateModelRolesTable extends Migration
     public function up()
     {
         Schema::create('model_roles', function (Blueprint $table) {
-            $table->string('entity_type');
-            $table->string('entity_id');
+            $table->string('model_type');
+            $table->string('model_id');
             $table->unsignedBigInteger('role_id');
-            $table->string('related_type')->nullable();
-            $table->string('related_id')->nullable();
+            $table->string('scope_type')->nullable();
+            $table->string('scope_id')->nullable();
             $table->timestamps();
         });
     }
