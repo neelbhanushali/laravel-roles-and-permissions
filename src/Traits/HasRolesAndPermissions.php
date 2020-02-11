@@ -24,42 +24,41 @@ trait HasRolesAndPermissions
             ->using(ModelPermission::class);
     }
 
-    public function getRoles($related_type = null, $related_id = null)
+    public function getRoles($scope_type = null, $scope_id = null)
     {
-        $model = $related_type ?? request('related_type');
-        $id = $related_id ?? request('related_id');
+        $scope_type = $scope_type ?? request('scope_type');
+        $scope_id = $scope_id ?? request('scope_id');
 
-        $roles = $this->roles()
-            ->where(function ($query) use ($id, $model) {
-                $query
-                    ->where(function ($query) {
-                        $query->whereNull('related_id')
-                            ->whereNull('related_type');
-                    })
-                    ->orWhere(function ($query) use ($id, $model) {
-                        $query->where('related_id', $id)
-                            ->where('related_type', $model);
-                    });
-            });
+        $roles = $this->roles()->where(compact('scope_id', 'scope_type'));
 
         return $roles->pluck('name');
     }
 
-    public function getPermissions()
+    public function getPermissions($scope_type = null, $scope_id = null)
     {
+        $scope_type = $scope_type ?? request('scope_type');
+        $scope_id = $scope_id ?? request('scope_id');
+
         $permissions_from_roles = collect([]);
         $this->roles->each(function ($r) use (&$permissions_from_roles) {
             $permissions_from_roles = $permissions_from_roles->merge($r->getPermissions());
         });
 
-        $model_permissions = $this->permissions()->revoked(false)->pluck('name');
+        $model_permissions = $this->permissions()
+            ->where(compact('scope_id', 'scope_type'))
+            ->revoked(false)
+            ->pluck('name');
 
         $all_permissions = $permissions_from_roles
             ->merge($model_permissions)
             ->unique()->values();
 
         // removing revoked permissions
-        $all_permissions = $all_permissions->diff($this->permissions()->revoked()->pluck('name'));
+        $revoked_permissions = $this->permissions()
+            ->where(compact('scope_id', 'scope_type'))
+            ->revoked()
+            ->pluck('name');
+        $all_permissions = $all_permissions->diff($revoked_permissions);
 
         return $all_permissions->unique()->values();
     }
