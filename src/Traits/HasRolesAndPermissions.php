@@ -11,14 +11,14 @@ trait HasRolesAndPermissions
 {
     public function roles()
     {
-        return $this->morphToMany(Role::class, 'entity', 'model_roles', null, 'role_id')
+        return $this->morphToMany(Role::class, 'model', 'model_roles', null, 'role_id')
             ->withTimestamps()
             ->using(ModelRole::class);
     }
 
     public function permissions()
     {
-        return $this->morphToMany(Permission::class, 'entity', 'model_permissions', null, 'permission_id')
+        return $this->morphToMany(Permission::class, 'model', 'model_permissions', null, 'permission_id')
             ->withTimestamps()
             ->withPivot('is_revoked')
             ->using(ModelPermission::class);
