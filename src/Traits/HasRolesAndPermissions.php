@@ -63,14 +63,14 @@ trait HasRolesAndPermissions
         return $all_permissions->unique()->values();
     }
 
-    public function hasRole($role)
+    public function hasRole($role, $scope_type = null, $scope_id = null)
     {
-        return $this->getRoles()->contains($role);
+        return $this->getRoles($scope_type, $scope_id)->contains($role);
     }
 
-    public function hasPermission($permission)
+    public function hasPermission($permission, $scope_type = null, $scope_id = null)
     {
-        return $this->getPermissions()->contains($permission);
+        return $this->getPermissions($scope_type, $scope_id)->contains($permission);
     }
 
     public function scopeRole($query, $role)

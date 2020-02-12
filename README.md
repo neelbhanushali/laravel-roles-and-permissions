@@ -5,23 +5,16 @@ use `NeelBhanushali\LaravelRolesAndPermissions\Traits\HasRolesAndPermissions` tr
 # relations
 * roles
 * permissions
-* entity
 
 # methods
-* getRoles()
-* getPermissions()
-* hasRole($role_name)
-* hasPermission($permission_name)
-
-# roles/permissions table have following columns
-* entity_id => nullable
-* entity_type => nullable
-* is_visible_to_users => default=1
+* getRoles($scope_type = null, $scope_id = null)
+* getPermissions($scope_type = null, $scope_id = null)
+* hasRole($role_name, $scope_type = null, $scope_id = null)
+* hasPermission($permission_name, $scope_type = null, $scope_id = null)
 
 # Notes
 * add following to `app/Http/Kernel.php` file
 ```
-'role' => \NeelBhanushali\LaravelRolesAndPermissions\Middleware\Role::class,
-'permission' => \NeelBhanushali\LaravelRolesAndPermissions\Middleware\Permission::class,
-'role-or-permission' => \NeelBhanushali\LaravelRolesAndPermissions\Middleware\RoleOrPermission::class,
+'roles' => \NeelBhanushali\LaravelRolesAndPermissions\Middleware\Role::class,
+'permissions' => \NeelBhanushali\LaravelRolesAndPermissions\Middleware\Permission::class,
 ```
